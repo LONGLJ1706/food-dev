@@ -1,0 +1,8 @@
+com\jqp\service\CarouselService.class
+com\jqp\service\ItemsService.class
+com\jqp\service\impl\CarouselServiceImpl.class
+com\jqp\service\impl\ItemsServiceImpl.class
+com\jqp\service\impl\CategoryServiceImpl.class
+com\jqp\service\impl\UserServiceImpl.class
+com\jqp\service\UserService.class
+com\jqp\service\CategoryService.class

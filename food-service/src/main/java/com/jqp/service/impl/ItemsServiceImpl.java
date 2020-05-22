@@ -1,0 +1,221 @@
+package com.jqp.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.jqp.mapper.*;
+import com.jqp.pojo.*;
+import com.jqp.service.ItemsService;
+import com.jqp.vo.CommentLevelCountsVO;
+import com.jqp.vo.ItemCommentVO;
+import com.jqp.vo.SearchItemsVO;
+import com.jqp.vo.ShopcartVO;
+import enums.CommentLevel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
+import util.PagedGridResult;
+import util.PagedGridResultUtils;
+
+import java.util.*;
+
+/**
+ * 事物传播：
+ * REQUIRED：使用当前事物，当前没有则新建一个事物，子方法必须运行在一个事物中的，
+ *          当前存在事物，则加入这个事物，成为一个整体。
+ *
+ * SUPPORTS：如果当前有事物，则使用事物，如果当前没有事物，则不使用事物。
+ *
+ * MANDATORY：该属性强制必须存在一个事物，如果不存在，则抛出异常。
+ *
+ * REQUIRES_NEW：如果当前有事物，则挂起当前事物，并且自己新建一个事物，
+ *              如果当前没有事物，则同REQUIRED。
+ *
+ * NOT_SUPPORTED：不适用事物，如果当前有事物，则挂起当前事物。
+ *
+ * NEVER：不准使用事物，如果当前有事物，则抛出异常。
+ *
+ * NESTED：如果当前有事物，则开启子事物（嵌套事物），嵌套事物是独立事物，
+ *         如果当前没有事物，则同REQUIRED，但是如果主事物提交，
+ *        则会携带子事物一起提交，如果主事物回滚，则子事物会一起回滚，相反，子事物异常，
+ *        则父事物可以回滚或不回滚。
+ */
+
+@Service
+public class ItemsServiceImpl implements ItemsService{
+
+    @Autowired
+    private ItemsMapper itemsMapper;
+
+    @Autowired
+    private ItemsImgMapper itemsImgMapper;
+
+    @Autowired
+    private ItemsSpecMapper itemsSpecMapper;
+
+    @Autowired
+    private ItemsParamMapper itemsParamMapper;
+
+    @Autowired
+    private ItemsCommentsMapper itemsCommentsMapper;
+
+    @Autowired
+    private ItemsMapperCustom itemsMapperCustom;
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public Items queryItemById(String itemId) {
+        return itemsMapper.selectByPrimaryKey(itemId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ItemsImg> queryItemImgList(String itemId) {
+        Example itemsImgExp = new Example(ItemsImg.class);
+        Example.Criteria criteria = itemsImgExp.createCriteria();
+        criteria.andEqualTo("itemId", itemId);
+        return itemsImgMapper.selectByExample(itemsImgExp);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ItemsSpec> queryItemSpecList(String itemId) {
+        Example itemsSpecExp = new Example(ItemsSpec.class);
+        Example.Criteria criteria = itemsSpecExp.createCriteria();
+        criteria.andEqualTo("itemId", itemId);
+        return itemsSpecMapper.selectByExample(itemsSpecExp);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public ItemsParam queryItemParam(String itemId) {
+        Example itemsParamExp = new Example(ItemsParam.class);
+        Example.Criteria criteria = itemsParamExp.createCriteria();
+        criteria.andEqualTo("itemId", itemId);
+        return itemsParamMapper.selectOneByExample(itemsParamExp);
+    }
+
+
+    /**
+     * 根据商品id查询商品的评价等级数量
+     * @param itemId
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public CommentLevelCountsVO queryCommentCounts(String itemId) {
+        //可以通过语句 select count(1) count, comment_level from items_comments where item_id = '' group by comment_level 一次性查出来
+        Integer goodCounts = getCommentCounts(itemId, CommentLevel.GOOD.type);
+        Integer normalCounts = getCommentCounts(itemId, CommentLevel.NORMAL.type);
+        Integer badCounts = getCommentCounts(itemId, CommentLevel.BAD.type);
+        Integer totalCounts = goodCounts + normalCounts + badCounts;
+
+        CommentLevelCountsVO countsVO = new CommentLevelCountsVO();
+        countsVO.setTotalCounts(totalCounts);
+        countsVO.setGoodCounts(goodCounts);
+        countsVO.setNormalCounts(normalCounts);
+        countsVO.setBadCounts(badCounts);
+        return countsVO;
+    }
+
+
+    /**
+     * 根据商品id查询商品的评价等级数量
+     * @param itemId
+     * @param level
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Integer getCommentCounts(String itemId, Integer level) {
+        ItemsComments condition = new ItemsComments();
+        condition.setItemId(itemId);
+        if (level != null) {
+            condition.setCommentLevel(level);
+        }
+        return itemsCommentsMapper.selectCount(condition);
+    }
+
+    /**
+     * 分页查询评论信息
+     * @param itemId
+     * @param level
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public PagedGridResult queryPagedComments(String itemId, Integer level, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("itemId", itemId);
+        map.put("level", level);
+        /**
+         * page: 第几页
+         * pageSize: 每页显示条数
+         */
+        PageHelper.startPage(page, pageSize);
+
+        List<ItemCommentVO> list = itemsMapperCustom.queryItemComments(map);
+        /* 脱敏方法  就是隐藏一些重要的信息，以 * 代替
+        if(list != null && list.size() > 0){
+            for (ItemCommentVO vo : list) {
+                vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
+            }
+        }*/
+
+        return PagedGridResultUtils.setterPagedGrid(list, page);
+    }
+
+
+    /**
+     * 搜索商品列表
+     * @param keywords
+     * @param sort
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searhItems(String keywords, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("keywords", keywords);
+        map.put("sort", sort);
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> list = itemsMapperCustom.searchItems(map);
+        return PagedGridResultUtils.setterPagedGrid(list, page);
+    }
+
+
+    /**
+     * 根据三级分类id搜索商品列表
+     * @param catId
+     * @param sort
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searhItems(Integer catId, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("catId", catId);
+        map.put("sort", sort);
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> list = itemsMapperCustom.searchItemsByThirdCat(map);
+        return PagedGridResultUtils.setterPagedGrid(list, page);
+    }
+
+
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ShopcartVO> queryItemsBySpecIds(String specIds) {
+        String ids[] = specIds.split(",");
+        List<String> specIdsList = new ArrayList<>();
+        Collections.addAll(specIdsList, ids);
+        return itemsMapperCustom.queryItemsBySpecIds(specIdsList);
+    }
+
+
+}

@@ -1,0 +1,15 @@
+com\jqp\mapper\ItemsParamMapper.class
+com\jqp\my\MyMapper.class
+com\jqp\mapper\UsersMapper.class
+com\jqp\mapper\OrderItemsMapper.class
+com\jqp\mapper\OrdersMapper.class
+com\jqp\mapper\CarouselMapper.class
+com\jqp\mapper\ItemsCommentsMapper.class
+com\jqp\mapper\ItemsMapperCustom.class
+com\jqp\mapper\OrderStatusMapper.class
+com\jqp\mapper\ItemsImgMapper.class
+com\jqp\mapper\CategoryMapper.class
+com\jqp\mapper\ItemsSpecMapper.class
+com\jqp\mapper\UserAddressMapper.class
+com\jqp\mapper\ItemsMapper.class
+com\jqp\mapper\CategoryMapperCustom.class
