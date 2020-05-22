@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="food-common" />
+        <module name="food-mapper" />
+        <module name="food-service" />
+        <module name="food-api" />
+        <module name="food-pojo" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="food-api" target="1.8" />
+      <module name="food-common" target="1.8" />
+      <module name="food-dev" target="1.8" />
+      <module name="food-mapper" target="1.8" />
+      <module name="food-pojo" target="1.8" />
+      <module name="food-service" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="food-api" options="-parameters" />
+      <module name="food-common" options="-parameters" />
+      <module name="food-mapper" options="-parameters" />
+      <module name="food-pojo" options="-parameters" />
+      <module name="food-service" options="-parameters" />
+    </option>
+  </component>
+</project>

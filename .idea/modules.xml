@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/food-api/food-api.iml" filepath="$PROJECT_DIR$/food-api/food-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/food-common/food-common.iml" filepath="$PROJECT_DIR$/food-common/food-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/food-dev.iml" filepath="$PROJECT_DIR$/food-dev.iml" />
+      <module fileurl="file://$PROJECT_DIR$/food-mapper/food-mapper.iml" filepath="$PROJECT_DIR$/food-mapper/food-mapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/food-pojo/food-pojo.iml" filepath="$PROJECT_DIR$/food-pojo/food-pojo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/food-service/food-service.iml" filepath="$PROJECT_DIR$/food-service/food-service.iml" />
+    </modules>
+  </component>
+</project>
