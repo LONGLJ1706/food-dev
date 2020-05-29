@@ -13,13 +13,13 @@ public class BaseController {
 
 
     // 支付中心的调用地址
+    //String paymentUrl = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";
     String paymentUrl = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";
-
 
     // 微信支付成功 -> 支付中心 -> 天天吃货平台
     //                       |-> 回调通知的url
-    String payReturnUrl = "http://api.z.mukewang.com/foodie-dev-api/orders/notifyMerchantOrderPaid";
-
+   // String payReturnUrl = "http://api.z.mukewang.com/foodie-dev-api/orders/notifyMerchantOrderPaid";
+    String payReturnUrl = "http://172.16.80.146:8080/foodie-shop/orders/notifyMerchantOrderPaid";
 
     // 用户上传头像的位置
     public static final String IMAGE_USER_FACE_LOCATION = File.separator + "workspaces" +

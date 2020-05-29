@@ -1,10 +1,10 @@
-com\jqp\controller\ShopCatController.class
 com\jqp\config\CorsConfig.class
+com\jqp\controller\IndexController.class
+com\jqp\aspect\ServiceLogAspect.class
+com\jqp\ApiApplication.class
+com\jqp\controller\ShopCatController.class
 com\jqp\controller\UserController.class
 com\jqp\controller\ItemsController.class
 com\jqp\config\Swagger2.class
-com\jqp\controller\IndexController.class
 com\jqp\controller\BaseController.class
-com\jqp\aspect\ServiceLogAspect.class
 com\jqp\controller\HelloController.class
-com\jqp\ApiApplication.class
